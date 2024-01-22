@@ -1,0 +1,32 @@
+# Compiled binary
+/bin/
+
+# Executables
+*.exe
+*.out
+
+# Dependency directories
+/vendor/
+/go.sum
+
+# Output of the go coverage tool
+/coverage.txt
+
+# Test binary
+/test.out
+
+# Output of the go example test coverage tool
+/example-coverage.txt
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Environment variables file (if used)
+.env
+
+# Go binary files
+*.test
+
+# Directory for temporary files
+/tmp/
