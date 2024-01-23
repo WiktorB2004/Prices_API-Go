@@ -7,5 +7,10 @@ type Supplier struct {
 	Phone         string   `json:"phoneNumber" bson:"phoneNumber"`
 	Email         string   `json:"email" bson:"email"`
 	Products      []string `json:"products" bson:"products"`
-	ProductsCount int      `json:"productsCount" bson:"productsCount"`
+	ProductsCount int      `json:"productCount" bson:"productCount"`
+}
+
+type SupplierResponse struct {
+	Message         string   `json:"message"`
+	ExistingProduct Supplier `json:"existingSupplier"`
 }
