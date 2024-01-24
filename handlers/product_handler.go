@@ -26,7 +26,7 @@ func CreateExtProduct(p app.Product, supplierName string) app.ExtProduct {
 	}
 }
 
-func GetProductData(c *gin.Context) {
+func GetProductsData(c *gin.Context) {
 	client := app.GetMongoClient()
 	collection := client.Database(app.MongoDB).Collection("products")
 
@@ -83,4 +83,28 @@ func GetProductData(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+func GetProductsByName(c *gin.Context) {
+	productName := c.Param("name")
+
+	client := app.GetMongoClient()
+	collection := client.Database(app.MongoDB).Collection("products")
+
+	filter := bson.M{"productName": productName}
+
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products data from MongoDB"})
+		return
+	}
+	defer cursor.Close(context.Background())
+
+	var dbResult []app.Product
+	if err := cursor.All(context.Background(), &dbResult); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode MongoDB documents"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dbResult)
 }

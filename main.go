@@ -21,8 +21,10 @@ func main() {
 	app.InitMongoDB()
 	router := gin.Default()
 
-	router.GET("/product-data", handlers.GetProductData)
-	router.GET("/supplier-data", handlers.GetSupplierData)
+	router.GET("/product-data", handlers.GetProductsData)
+	router.GET("/product-data/:name", handlers.GetProductsByName)
+	router.GET("/supplier-data", handlers.GetSuppliersData)
+	router.GET("/", handlers.GetIndex)
 
 	serverAddr := ":8080"
 	fmt.Printf("Server is running on http://localhost%s\n", serverAddr)

@@ -18,7 +18,7 @@ type supplierStats struct {
 	Products int     `json:"Products" bson:"Products"`
 }
 
-func GetSupplierData(c *gin.Context) {
+func GetSuppliersData(c *gin.Context) {
 	client := app.GetMongoClient()
 	collection := client.Database(app.MongoDB).Collection("suppliers")
 
