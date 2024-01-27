@@ -1,0 +1,16 @@
+# Ignore unnecessary files and directories in the Docker build context
+
+# Ignore version control system files
+.git
+
+# Ignore editor and IDE files
+.idea
+.vscode
+
+# Ignore build artifacts
+*.o
+*.a
+*.exe
+
+# Ignore test files
+*_test.go
