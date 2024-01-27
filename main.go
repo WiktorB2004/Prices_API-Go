@@ -26,7 +26,7 @@ func main() {
 	router.GET("/supplier-data", handlers.GetSuppliersData)
 	router.GET("/", handlers.GetIndex)
 
-	serverAddr := ":8080"
+	serverAddr := ":3001"
 	fmt.Printf("Server is running on http://localhost%s\n", serverAddr)
 	if err := router.Run(serverAddr); err != nil {
 		log.Fatal(err)
