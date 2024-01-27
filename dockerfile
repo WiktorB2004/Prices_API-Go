@@ -5,7 +5,7 @@ FROM golang:1.21-alpine
 WORKDIR /app
 
 # Prepare go projectO
-COPY go.mod .
+COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 # Copy the project files
@@ -14,7 +14,7 @@ COPY . .
 RUN go build -o /app/bin/main .
 
 # Expose port 8080 to the outside world
-EXPOSE 8080
+EXPOSE 3001
 
 # Command to run the executable
 CMD ["/app/bin/main"]
