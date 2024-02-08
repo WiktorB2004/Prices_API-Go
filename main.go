@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"pricesAPI/app"
 	"pricesAPI/handlers"
@@ -12,8 +13,17 @@ import (
 )
 
 func init() {
+	// Load environment variables from the .env file
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Warning: .env file not found or unable to load.")
+	}
+
+	// Check if required environment variables are set
+	requiredEnvVars := []string{"MONGODB_URL", "MONGODB_DB"}
+	for _, envVar := range requiredEnvVars {
+		if _, exists := os.LookupEnv(envVar); !exists {
+			log.Fatalf("Error: Required environment variable %s is not set.", envVar)
+		}
 	}
 }
 
@@ -26,7 +36,7 @@ func main() {
 	router.GET("/supplier-data", handlers.GetSuppliersData)
 	router.GET("/", handlers.GetIndex)
 
-	serverAddr := ":8080"
+	serverAddr := ":3001"
 	fmt.Printf("Server is running on http://localhost%s\n", serverAddr)
 	if err := router.Run(serverAddr); err != nil {
 		log.Fatal(err)
