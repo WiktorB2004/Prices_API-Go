@@ -30,10 +30,22 @@ func init() {
 func main() {
 	app.InitMongoDB()
 	router := gin.Default()
-
+	// /product* routes
 	router.GET("/product-data", handlers.GetProductsData)
 	router.GET("/product-data/:name", handlers.GetProductsByName)
+
+	// /supplier* routes
 	router.GET("/supplier-data", handlers.GetSuppliersData)
+
+	// /register* routes
+	router.POST("/register", handlers.PostClientRegister)
+
+	// /client* routes
+	router.GET("/client", handlers.GetClientData)
+	router.POST("/client/keys", handlers.PostClientKey)
+	router.DELETE("/client", handlers.DeleteClient)
+
+	// Index route
 	router.GET("/", handlers.GetIndex)
 
 	serverAddr := ":3001"
