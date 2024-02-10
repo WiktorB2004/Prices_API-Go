@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"pricesAPI/app"
 
@@ -21,6 +22,11 @@ type supplierStats struct {
 func GetSuppliersData(c *gin.Context) {
 	client := app.GetMongoClient()
 	collection := client.Database(app.MongoDB).Collection("suppliers")
+
+	// Increment count on apikey and authenticate user
+	if !app.IncrementAndAuthenticate(c, client) {
+		return
+	}
 
 	cursor, err := collection.Find(context.Background(), bson.D{})
 	if err != nil {
@@ -41,7 +47,7 @@ func GetSuppliersData(c *gin.Context) {
 		if supplier.ProductsCount > 0 {
 			currSupplier := result[supplier.Name]
 			for _, productId := range supplier.Products {
-				ProductReq, err := http.Get(fmt.Sprintf("http://localhost:3000/product/%s", productId))
+				ProductReq, err := http.Get(fmt.Sprintf("http://localhost:%s/product/%s", os.Getenv("SHOP_PORT"), productId))
 				if err != nil {
 					fmt.Println("Error making GET request:", err)
 					return

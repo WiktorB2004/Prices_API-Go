@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-
 	"pricesAPI/app"
 
 	"github.com/gin-gonic/gin"

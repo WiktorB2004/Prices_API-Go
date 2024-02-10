@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"pricesAPI/app"
 
@@ -28,8 +29,14 @@ func CreateExtProduct(p app.Product, supplierName string) app.ExtProduct {
 
 func GetProductsData(c *gin.Context) {
 	client := app.GetMongoClient()
-	collection := client.Database(app.MongoDB).Collection("products")
 
+	// Increment count on apikey and authenticate user
+	if !app.IncrementAndAuthenticate(c, client) {
+		return
+	}
+
+	// Get products data
+	collection := client.Database(app.MongoDB).Collection("products")
 	cursor, err := collection.Find(context.Background(), bson.D{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products data from MongoDB"})
@@ -43,12 +50,12 @@ func GetProductsData(c *gin.Context) {
 		return
 	}
 
-	result := make(map[string]productStats)
+	productRes := make(map[string]productStats)
 	// Group products with the same name together
 	for _, product := range dbResult {
-		currProduct := result[product.Name]
+		currProduct := productRes[product.Name]
 
-		SupplierReq, err := http.Get(fmt.Sprintf("http://localhost:3000/supplier/%s", product.SupplierID))
+		SupplierReq, err := http.Get(fmt.Sprintf("http://localhost:%s/supplier/%s", os.Getenv("SHOP_PORT"), product.SupplierID))
 		if err != nil {
 			fmt.Println("Error making GET request:", err)
 			return
@@ -68,28 +75,32 @@ func GetProductsData(c *gin.Context) {
 		}
 
 		currProduct.ProductList = append(currProduct.ProductList, CreateExtProduct(product, suppRes.ExistingProduct.Name))
-		result[product.Name] = currProduct
+		productRes[product.Name] = currProduct
 	}
 
 	// Calculate average price for each group
-	for prodName, stats := range result {
+	for prodName, stats := range productRes {
 		if len(stats.ProductList) > 0 {
 			for _, product := range stats.ProductList {
 				stats.AvgPrice += float32(product.Price)
 			}
 			stats.AvgPrice /= float32(len(stats.ProductList))
 		}
-		result[prodName] = stats
+		productRes[prodName] = stats
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, productRes)
 }
 
 func GetProductsByName(c *gin.Context) {
 	productName := c.Param("name")
-
 	client := app.GetMongoClient()
 	collection := client.Database(app.MongoDB).Collection("products")
+
+	// Increment count on apikey and authenticate user
+	if !app.IncrementAndAuthenticate(c, client) {
+		return
+	}
 
 	filter := bson.M{"productName": productName}
 
